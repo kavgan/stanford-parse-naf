@@ -41,7 +41,7 @@ except getopt.GetoptError:
   pass
 
 
-logging.debug('Starting stanford parser for German text')
+logging.debug('Starting stanford parser for English')
 logging.debug('Loading and parsing KAF file ...')
 my_kaf = KafParser(sys.stdin)
 
@@ -66,7 +66,7 @@ if len(current_sent) !=0:
   sentences.append(current_sent)
 
 
-logging.debug('Calling to Stanford parser for GERMAN in '+STANFORD_HOME)
+logging.debug('Calling to Stanford parser for English in '+STANFORD_HOME)
 
 ## CALL TO STANFORD
 os.environ['STANFORD_HOME'] = STANFORD_HOME
