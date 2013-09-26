@@ -17,10 +17,12 @@ import edu.stanford.nlp.trees.HeadFinder;
 import edu.stanford.nlp.trees.SemanticHeadFinder;
 
 /**
- * This module provides POS tagging and lemmatization for English text using
+ * This module provides parsing for English text using
  * Stanford CoreNLP API http://www-nlp.stanford.edu/software/).
  * 
- * It outputs KAF <terms>.
+ * The module takes KAF and reads the header, <text> and <terms> elements and uses 
+ * Annotate class to provide constituent parsing of sentences in both Penn Treebank and 
+ * KAF form which are provided via standard output.
  * 
  * 
  * @author ragerri
@@ -30,10 +32,7 @@ public class CLI {
 	/**
 	 * 
 	 * 
-	 * BufferedReader (from standard input) and BufferedWriter are opened. The
-	 * module takes KAF and reads the header, and the text elements and uses
-	 * Annotate class to provide constituent parsing of sentences, which are
-	 * provided via standard output.
+	 * BufferedReader (from standard input) and BufferedWriter are opened. 
 	 * 
 	 * @param args
 	 * @throws Exception 
@@ -99,11 +98,8 @@ public class CLI {
 			KAFDocument kaf = KAFDocument.createFromStream(breader);
 			kaf.addLinguisticProcessor("constituents","stanford-parse-"+lang,"3.2.0");
 
-			// choosing HeadFinder: (Collins rules for English and derivations
-			// of it
-			// for other languages; sem (Semantic headFinder re-implemented from
-			// Stanford CoreNLP).
-			// Default: sem (semantic head finder).
+			// choosing HeadFinder: (Collins rules; sem Semantic headFinder re-implemented from
+			// Stanford CoreNLP. Default: sem (semantic head finder).
 			
 			HeadFinder headFinder = null;
 				
@@ -117,10 +113,10 @@ public class CLI {
 				Annotate annotator = new Annotate(outputFormat,"markHeadNodes",headFinder);
 				// check if kaf is chosen
 				if (parsedArguments.getBoolean("kaf") == true) {
-				annotator.getParseToKAF(kaf);
+				annotator.parseToKAF(kaf);
 			}
 				else { 
-					annotator.getParse(kaf);
+					annotator.parse(kaf);
 				}
 			}
 			
@@ -128,15 +124,16 @@ public class CLI {
 			else {
 				Annotate annotator = new Annotate(outputFormat);
 				if (parsedArguments.getBoolean("kaf") == true) {
-				annotator.getParseToKAF(kaf);
+				annotator.parseToKAF(kaf);
 				} 
 				else { 
-					annotator.getParse(kaf);
+					annotator.parse(kaf);
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		breader.close();
 
 	}
 }

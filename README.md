@@ -1,7 +1,7 @@
-Stanford-pos
+Stanford-parse
 ===============
 
-This module provides a 'ready to use' KAF wrapper for English POS tagging and lemmatization using Stanford CoreNLP API (http://www-nlp.stanford.edu/software/)
+This module provides a 'ready to use' KAF wrapper for English Parser using Stanford CoreNLP API (http://www-nlp.stanford.edu/software/)
 
 All dependencies and classpath configurations are automatically managed by Maven.
 
@@ -19,7 +19,7 @@ The contents of the module are the following:
 INSTALLATION
 ============
 
-Installing stanford-pos requires the following steps:
+Installing stanford-parse requires the following steps:
 
 If you already have installed in your machine JDK7 and MAVEN 3, please go to step 3
 directly. Otherwise, follow these steps:
@@ -84,31 +84,36 @@ You should see reference to the MAVEN version you have just installed plus the J
 --------------------------
 
 ````shell
-hg clone ssh://hg@bitbucket.org/ragerri/stanford-pos-en
+hg clone ssh://hg@bitbucket.org/ragerri/stanford-parse-en
 ````
 
 4. Move into main directory
 ---------------------------
 
 ````shell
-cd stanford-pos
+cd stanford-parse
 ````
 
 5. Install module using maven
 -----------------------------
 
-Obtain the POS tagger english-left3words-distsim.tagger model included in the postagger tool at the the Stanford NLP Group site:
+Obtain the Parser model englishPCFG.ser.gz model included in the Stanford parser at the the Stanford NLP Group site:
 
 
 ````shell
-http://nlp.stanford.edu/software/tagger.shtml
+http://www-nlp.stanford.edu/software/lex-parser.shtml
 ````
 
-After you unzip the downloaded module look for the english-left3words-distsim.tagger in the $tagger/models directory and copy it
-to stanford-pos/src/main/resources/ directory:
+After you unzip the downloaded module look for the stanford-parser-3.2.0-models.jar in the parser directory and
+extract the models:
 
 ````shell
-cp english-left3words-distsim.tagger stanford-pos/src/main/resources/
+jar xf stanford-parser-3.2.0-models.jar
+````
+and copy it to stanford-parse/src/main/resources/ directory:
+
+````shell
+cp edu/models/stanford/nlp/models/lexparser/englishPCFG.ser.gz stanford-parse/src/main/resources/
 ````
 
 Compile package:
@@ -120,9 +125,9 @@ mvn clean package
 This step will create a directory called target/ which contains various directories and files.
 Most importantly, there you will find the module executable:
 
-stantord-pos-3.2.0.jar
+stantord-parse-3.2.0.jar
 
-The version reflects the API version of Stanford-coreNLP used to create this module.
+The version reflects the API version of Stanford-CoreNLP used to create this module.
 
 This executable contains every dependency the module needs, so it is completely portable as long
 as you have a JVM 1.7 installed.
@@ -133,18 +138,25 @@ To install the module as in the maven's user local repository, located in ~/.m2/
 mvn clean install
 ````
 
-6. USING stantord-pos
+6. USING stantord-parse
 ========================
 
-The program accepts KAF (<terms> elements) as input and outputs <terms> elements in KAF containg POS tags and lemmas:
+The program accepts KAF (<text> and <terms> elements) as input and outputs <constituents> elements in KAF containing the parse trees:
 
 https://github.com/opener-project/kaf/wiki/KAF-structure-overview
 
 To run the program execute:
 
 ````shell
-cat file.txt | java -jar $PATH/target/stantord-pos-3.2.0.jar
+cat file.kaf | java -jar $PATH/target/stantord-parse-3.2.0.jar --kaf
 ````
+
+It also provides Collins and Semantic Head Words and other output formats such as Penn TreeBank. Check the tool help for a description:
+
+````shell
+java -jar $PATH/target/stantord-parse-3.2.0.jar -help
+````
+
 
 GENERATING JAVADOC
 ==================
@@ -155,7 +167,7 @@ You can also generate the javadoc of the module by executing:
 mvn javadoc:jar
 ````
 
-Which will create a jar file core/target/stantord-pos-3.2.0-javadoc.jar
+Which will create a jar file core/target/stantord-parse-3.2.0-javadoc.jar
 
 
 Contact information
