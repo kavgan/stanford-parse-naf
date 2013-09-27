@@ -1,7 +1,8 @@
 Stanford-parse
 ===============
 
-This module provides a 'ready to use' KAF wrapper for English Parser using Stanford CoreNLP API (http://www-nlp.stanford.edu/software/)
+This module provides a 'ready to use' KAF wrapper for English Constituent Parser (including head words) 
+using Stanford CoreNLP API (http://www-nlp.stanford.edu/software/)
 
 All dependencies and classpath configurations are automatically managed by Maven.
 

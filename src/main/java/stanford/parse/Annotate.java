@@ -87,7 +87,6 @@ public class Annotate {
           // Constituent Parsing
           List<CoreLabel> rawWords = Sentence.toCoreLabelList(tokens);
           Tree parse = parser.apply(rawWords);
-          
           //output Tree in various formats
           treePrinter.printTree(parse,pw);
           parsedDoc.append(sw.toString());
