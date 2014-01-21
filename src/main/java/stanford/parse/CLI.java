@@ -122,6 +122,7 @@ public class CLI {
           } else {
             headFinder = new SemanticHeadFinder();
           }
+        }
           if (parsedArguments.get("lang").equals("de")) {
             if (headFinderOption.equalsIgnoreCase("collins")) {
               headFinder = new NegraHeadFinder();
@@ -138,7 +139,6 @@ public class CLI {
             annotator.parse(kaf);
           }
 
-        }
       }
 
       // parse without heads
