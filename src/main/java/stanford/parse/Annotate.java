@@ -17,6 +17,7 @@ import edu.stanford.nlp.trees.PennTreebankLanguagePack;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreePrint;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
+import edu.stanford.nlp.trees.international.negra.NegraPennLanguagePack;
 
 /**
  * This class provides a takes KAF <text> and <terms> as input and outputs 
@@ -39,8 +40,13 @@ public class Annotate {
 	   * 
 	   * @param outputFormat
 	   */
-	  public Annotate(String outputFormat) {
-	    parser = LexicalizedParser.loadModel("englishPCFG.ser.gz");
+	  public Annotate(String lang, String outputFormat) {
+		if (lang.equalsIgnoreCase("en")) { 
+			parser = LexicalizedParser.loadModel("englishPCFG.ser.gz");
+		}
+		if (lang.equalsIgnoreCase("de")) { 
+			parser = LexicalizedParser.loadModel("germanPCFG.ser.gz");
+		}
 	    treePrinter = new TreePrint(outputFormat);
 	    parsedDoc = new StringBuilder();
 	  }
@@ -56,10 +62,16 @@ public class Annotate {
 	   * @param markHeadNodes mark head words in the parse tree
 	   * @param headFinder either Collins or Semantic HeadFinder
 	   */
-	  public Annotate(String outputFormat, String markHeadNodes, HeadFinder headFinder) {
+	  public Annotate(String lang, String outputFormat, String markHeadNodes, HeadFinder headFinder) {
+		  if (lang.equalsIgnoreCase("en")) { 
+				parser = LexicalizedParser.loadModel("englishPCFG.ser.gz");
+				tlp = new PennTreebankLanguagePack();
+			}
+			if (lang.equalsIgnoreCase("de")) { 
+				parser = LexicalizedParser.loadModel("germanPCFG.ser.gz");
+				tlp = new NegraPennLanguagePack();
+			}
 	      parsedDoc = new StringBuilder();
-		  parser = LexicalizedParser.loadModel("englishPCFG.ser.gz");
-		  tlp = new PennTreebankLanguagePack();
 		  treePrinter = new TreePrint(outputFormat,markHeadNodes,tlp, headFinder, headFinder);
 	  }
 	  

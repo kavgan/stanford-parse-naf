@@ -62,6 +62,15 @@ public class CLI {
 				.help("Choose between Collins-based or Stanford Semantic HeadFinder");
 		
 
+		// specify language
+	    parser
+	        .addArgument("-l", "--lang")
+	        .choices("en","de")
+	        .required(false)
+	        .help(
+	            "Choose a language to perform annotation with ixa-pipe-parse");
+	    
+		
 		/*
 		 * Parse the command line arguments
 		 */
@@ -79,8 +88,7 @@ public class CLI {
 		/*
 		 * Load language and headFinder parameters
 		 */
-
-		String lang = "en";
+		
 		String outputFormat = parsedArguments.getString("outputFormat");
 		String headFinderOption;
 		if (parsedArguments.get("heads") == null) {
@@ -96,6 +104,15 @@ public class CLI {
 			breader = new BufferedReader(new InputStreamReader(System.in,
 					"UTF-8"));
 			KAFDocument kaf = KAFDocument.createFromStream(breader);
+			// language parameter
+		    String lang;
+		      if (parsedArguments.get("lang") == null) { 
+		      	  lang = kaf.getLang();
+		        }
+		        else { 
+		      	 lang =  parsedArguments.getString("lang");
+		        }
+		      
 			kaf.addLinguisticProcessor("constituents","stanford-parse-"+lang,"3.2.0");
 
 			// choosing HeadFinder: (Collins rules; sem Semantic headFinder re-implemented from
@@ -110,7 +127,7 @@ public class CLI {
 				else { 
 					headFinder = new SemanticHeadFinder();
 				}
-				Annotate annotator = new Annotate(outputFormat,"markHeadNodes",headFinder);
+				Annotate annotator = new Annotate(lang, outputFormat,"markHeadNodes",headFinder);
 				// check if kaf is chosen
 				if (parsedArguments.getBoolean("kaf") == true) {
 				annotator.parseToKAF(kaf);
@@ -122,7 +139,7 @@ public class CLI {
 			
 			// parse without heads
 			else {
-				Annotate annotator = new Annotate(outputFormat);
+				Annotate annotator = new Annotate(lang, outputFormat);
 				if (parsedArguments.getBoolean("kaf") == true) {
 				annotator.parseToKAF(kaf);
 				} 
