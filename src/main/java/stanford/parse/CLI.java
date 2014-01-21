@@ -15,6 +15,7 @@ import net.sourceforge.argparse4j.inf.Namespace;
 import edu.stanford.nlp.trees.CollinsHeadFinder;
 import edu.stanford.nlp.trees.HeadFinder;
 import edu.stanford.nlp.trees.SemanticHeadFinder;
+import edu.stanford.nlp.trees.international.negra.NegraHeadFinder;
 
 /**
  * This module provides parsing for English text using
@@ -119,13 +120,23 @@ public class CLI {
 			// Stanford CoreNLP. Default: sem (semantic head finder).
 			
 			HeadFinder headFinder = null;
-				
+			
 			if (!headFinderOption.isEmpty()) {
+				
+				if (parsedArguments.get("lang").equals("en")) { 
 				if (headFinderOption.equalsIgnoreCase("collins")) {
 					headFinder = new CollinsHeadFinder();
 				}
 				else { 
 					headFinder = new SemanticHeadFinder();
+				}
+				if (parsedArguments.get("lang").equals("de")) { 
+					if (headFinderOption.equalsIgnoreCase("collins")) { 
+						headFinder = new NegraHeadFinder();
+					}
+					else { 
+						headFinder  = new NegraHeadFinder();
+					}
 				}
 				Annotate annotator = new Annotate(lang, outputFormat,"markHeadNodes",headFinder);
 				// check if kaf is chosen
@@ -135,7 +146,10 @@ public class CLI {
 				else { 
 					annotator.parse(kaf);
 				}
+			 
 			}
+			
+			
 			
 			// parse without heads
 			else {
