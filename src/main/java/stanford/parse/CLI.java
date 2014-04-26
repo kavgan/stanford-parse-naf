@@ -63,7 +63,7 @@ public class CLI {
 
     // specify language
     parser.addArgument("-l", "--lang").choices("en", "de").required(false)
-        .help("Choose a language to perform annotation with ixa-pipe-parse");
+        .help("Choose a language to perform annotation with stanford-parse");
 
     /*
      * Parse the command line arguments
