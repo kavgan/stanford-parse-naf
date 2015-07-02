@@ -4,7 +4,7 @@
 	<groupId>stanford</groupId>
 	<artifactId>stanford-parse</artifactId>
 	<packaging>jar</packaging>
-	<version>3.2.0</version>
+	<version>3.5.2</version>
 	<name>stanford-parse</name>
 	<description>Stanford Parser via API.
         </description>
@@ -48,6 +48,13 @@
 		  <version>3.5.2</version>
 		  <scope>compile</scope>
 		</dependency>
+
+        <dependency>
+            <groupId>edu.stanford.nlp</groupId>
+            <artifactId>stanford-corenlp</artifactId>
+            <version>3.5.2</version>
+            <classifier>models</classifier>
+        </dependency>
 
 		<dependency>
 		  <groupId>net.sourceforge.argparse4j</groupId>

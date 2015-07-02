@@ -73,8 +73,7 @@ public class CLI {
         System.err.println("Language from KAF");
     }
 
-    kaf.addLinguisticProcessor("constituents", "stanford-parse-" + lang,
-      "3.2.0");
+    kaf.addLinguisticProcessor("constituents", "stanford-parse-" + lang, "3.5.2");
 
     // Prepare annotator and annotate
     Annotate annotator;
@@ -133,8 +132,8 @@ public class CLI {
 
     private static ArgumentParser getArgumentParser() {
         // create Argument Parser
-        ArgumentParser parser = ArgumentParsers.newArgumentParser("stanford-parse-3.2.0.jar")
-                .description("stanford-parse-3.2.0 is a KAF wrapper for the English Stanford Parser.\n");
+        ArgumentParser parser = ArgumentParsers.newArgumentParser("stanford-parse-3.5.2.jar")
+                .description("stanford-parse-3.5.2 is a KAF wrapper for the English Stanford Parser.\n");
 
         MutuallyExclusiveGroup excGroup = parser.addMutuallyExclusiveGroup();
 
@@ -152,7 +151,7 @@ public class CLI {
         parser.addArgument("-l", "--lang").choices("en", "de").setDefault("")
             .help("Choose a language to perform annotation with stanford-parse");
         parser.addArgument("-m", "--model")
-            .setDefault("englishPCFG.ser.gz").required(false)
+            .setDefault("edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz").required(false)
                 .help("Choose a Model to perform annotation with stanford-parse");
         return parser;
     }
