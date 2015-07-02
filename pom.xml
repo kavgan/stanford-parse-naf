@@ -24,14 +24,6 @@
 	<url>http://maven.apache.org</url>
 
 	<repositories>
-	<repository>
-      <id>ixa-ehu.github</id>
-      <url>https://raw.github.com/ixa-ehu/kaflib-mvn-repo/master</url>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-    </repository>
 	</repositories>
 
 	<dependencies>
@@ -63,9 +55,9 @@
 		</dependency>
 
 		<dependency>
-		  <groupId>ixa.kaflib</groupId>
+		  <groupId>com.github.ixa-ehu</groupId>
 		  <artifactId>kaflib-naf</artifactId>
-		  <version>1.0-SNAPSHOT</version>
+		  <version>1.0.3</version>
 		</dependency>
 	</dependencies>
 
