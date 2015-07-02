@@ -40,120 +40,120 @@ public class CLI {
    */
 
   public static void main(String[] args) throws Exception {
-
-    Namespace parsedArguments = null;
-
-    // create Argument Parser
-    ArgumentParser parser = ArgumentParsers.newArgumentParser(
-        "stanford-parse-3.2.0.jar").description(
-        "stanford-parse-3.2.0 is a KAF wrapper for the English Stanford Parser"
-            + ".\n");
-
-    MutuallyExclusiveGroup excGroup = parser.addMutuallyExclusiveGroup();
-
-    excGroup.addArgument("-k", "--kaf").action(Arguments.storeTrue())
-        .help("Choose KAF format");
-    excGroup.addArgument("-o", "--outputFormat").choices("penn", "oneline")
-        .setDefault("oneline").required(false)
-        .help("Choose between Penn style or oneline LISP style tree output");
-
-    parser.addArgument("-g", "--heads").choices("collins", "sem")
-        .required(false)
-        .help("Choose between Collins-based or Stanford Semantic HeadFinder");
-
-    // specify language
-    parser.addArgument("-l", "--lang").choices("en", "de").required(false)
-        .help("Choose a language to perform annotation with stanford-parse");
-
-    /*
+     /*
      * Parse the command line arguments
      */
-
-    // catch errors and print help
-    try {
-      parsedArguments = parser.parseArgs(args);
-    } catch (ArgumentParserException e) {
-      parser.handleError(e);
-      System.out
-          .println("Run java -jar target/stanford-parse-3.2.0.jar -help for details");
-      System.exit(1);
-    }
+      ArgumentParser parser = getArgumentParser();
+      Namespace parsedArguments = parseParameters(args, parser);
 
     /*
-     * Load language and headFinder parameters
+     * Parameters
      */
 
     String outputFormat = parsedArguments.getString("outputFormat");
-    String headFinderOption;
-    if (parsedArguments.get("heads") == null) {
-      headFinderOption = "";
-    } else {
-      headFinderOption = parsedArguments.getString("heads");
+    String model = parsedArguments.getString("model");
+    String headFinderOption = parsedArguments.getString("heads");
+    String lang = parsedArguments.getString("lang");
+    Boolean outputKaf = parsedArguments.getBoolean("kaf");
+
+    //Load KAF
+    KAFDocument kaf = null;
+    try (BufferedReader buffer = new BufferedReader(new InputStreamReader(System.in, "UTF-8"))){
+      // construct kaf Reader and read from standard input
+      kaf = KAFDocument.createFromStream(buffer);
+    } catch (IOException e) {
+      e.printStackTrace();
+      System.exit(1);
     }
 
-    BufferedReader breader = null;
+    // language parameter from KAF
 
-    try {
-      // construct kaf Reader and read from standard input
-      breader = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
-      KAFDocument kaf = KAFDocument.createFromStream(breader);
-      // language parameter
-      String lang;
-      if (parsedArguments.get("lang") == null) {
-        lang = kaf.getLang();
-      } else {
-        lang = parsedArguments.getString("lang");
-      }
+    if (lang.isEmpty()) {
+      lang = kaf.getLang();
+        System.err.println("Language from KAF");
+    }
 
-      kaf.addLinguisticProcessor("constituents", "stanford-parse-" + lang,
-          "3.2.0");
+    kaf.addLinguisticProcessor("constituents", "stanford-parse-" + lang,
+      "3.2.0");
 
+    // Prepare annotator and annotate
+    Annotate annotator;
+
+    if (!headFinderOption.isEmpty()) {
       // choosing HeadFinder: (Collins rules; sem Semantic headFinder
       // re-implemented from
       // Stanford CoreNLP. Default: sem (semantic head finder).
-
       HeadFinder headFinder = null;
-
-      if (!headFinderOption.isEmpty()) {
-
-        if (parsedArguments.get("lang").equals("en")) {
-          if (headFinderOption.equalsIgnoreCase("collins")) {
-            headFinder = new CollinsHeadFinder();
-          } else {
-            headFinder = new SemanticHeadFinder();
-          }
-        }
-          if (parsedArguments.get("lang").equals("de")) {
-            if (headFinderOption.equalsIgnoreCase("collins")) {
-              headFinder = new NegraHeadFinder();
-            } else {
-              headFinder = new NegraHeadFinder();
-            }
-          }
-          Annotate annotator = new Annotate(lang, outputFormat,
-              "markHeadNodes", headFinder);
-          // check if kaf is chosen
-          if (parsedArguments.getBoolean("kaf") == true) {
-            annotator.parseToKAF(kaf);
-          } else {
-            annotator.parse(kaf);
-          }
-
+      if (lang.isEmpty()){
+        System.err.println("If you want Head you need to specify lang");
+          System.exit(1);
       }
-
-      // parse without heads
-      else {
-        Annotate annotator = new Annotate(lang, outputFormat);
-        if (parsedArguments.getBoolean("kaf") == true) {
-          annotator.parseToKAF(kaf);
+      if (lang.equalsIgnoreCase("en")) {
+        if (headFinderOption.equalsIgnoreCase("collins")) {
+          headFinder = new CollinsHeadFinder();
         } else {
-          annotator.parse(kaf);
+          headFinder = new SemanticHeadFinder();
         }
       }
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    breader.close();
-
+      if (lang.equalsIgnoreCase("de")) {
+        headFinder = new NegraHeadFinder();
+        }
+      annotator = new Annotate(
+        lang,model,
+        outputFormat,
+        "markHeadNodes", headFinder);
+      }
+      // annotator without heads
+      else {
+        annotator = new Annotate(model, outputFormat);
+      }
+      // print output
+      String output;
+      // check if kaf is chosen and parse
+      if (outputKaf) {
+        output = annotator.parseToKAF(kaf);
+      } else {
+        output = annotator.parse(kaf);
+      }
+      System.out.print(output);
   }
+
+    private static Namespace parseParameters(String[] args, ArgumentParser parser) {
+        Namespace parsedArguments = null;
+        try {
+          parsedArguments = parser.parseArgs(args);
+        } catch (ArgumentParserException e) {
+          parser.handleError(e);
+          System.out
+              .println("Run java -jar target/stanford-parse-3.2.0.jar -help for details");
+          System.exit(1);
+        }
+        return parsedArguments;
+    }
+
+    private static ArgumentParser getArgumentParser() {
+        // create Argument Parser
+        ArgumentParser parser = ArgumentParsers.newArgumentParser("stanford-parse-3.2.0.jar")
+                .description("stanford-parse-3.2.0 is a KAF wrapper for the English Stanford Parser.\n");
+
+        MutuallyExclusiveGroup excGroup = parser.addMutuallyExclusiveGroup();
+
+        excGroup.addArgument("-k", "--kaf").action(Arguments.storeTrue())
+            .help("Choose KAF format");
+        excGroup.addArgument("-o", "--outputFormat").choices("penn", "oneline")
+            .setDefault("oneline").required(false)
+            .help("Choose between Penn style or oneline LISP style tree output");
+        parser.addArgument("-g", "--heads")
+            .choices("collins", "sem")
+            .setDefault("")
+            .required(false)
+            .help("Choose between Collins-based or Stanford Semantic HeadFinder");
+        // specify language
+        parser.addArgument("-l", "--lang").choices("en", "de").setDefault("")
+            .help("Choose a language to perform annotation with stanford-parse");
+        parser.addArgument("-m", "--model")
+            .setDefault("englishPCFG.ser.gz").required(false)
+                .help("Choose a Model to perform annotation with stanford-parse");
+        return parser;
+    }
 }

@@ -43,13 +43,8 @@ public class Annotate {
    * 
    * @param outputFormat
    */
-  public Annotate(String lang, String outputFormat) {
-    if (lang.equalsIgnoreCase("en")) {
-      parser = LexicalizedParser.loadModel("englishPCFG.ser.gz");
-    }
-    if (lang.equalsIgnoreCase("de")) {
-      parser = LexicalizedParser.loadModel("germanPCFG.ser.gz");
-    }
+  public Annotate(String model, String outputFormat) {
+    parser = LexicalizedParser.loadModel(model);
     treePrinter = new TreePrint(outputFormat);
     parsedDoc = new StringBuilder();
   }
@@ -64,23 +59,20 @@ public class Annotate {
    * 
    * @param outputFormat
    *          either oneline or penn format
-   * @param markHeadNodes
-   *          mark head words in the parse tree
    * @param headFinder
    *          either Collins or Semantic HeadFinder
    */
-  public Annotate(String lang, String outputFormat, String markHeadNodes,
-      HeadFinder headFinder) {
+  public Annotate(String lang, String model, String outputFormat, String optionsString,
+                  HeadFinder headFinder) {
+    parser = LexicalizedParser.loadModel(model);
     if (lang.equalsIgnoreCase("en")) {
-      parser = LexicalizedParser.loadModel("englishPCFG.ser.gz");
       tlp = new PennTreebankLanguagePack();
     }
     if (lang.equalsIgnoreCase("de")) {
-      parser = LexicalizedParser.loadModel("germanPCFG.ser.gz");
       tlp = new NegraPennLanguagePack();
     }
     parsedDoc = new StringBuilder();
-    treePrinter = new TreePrint(outputFormat, markHeadNodes, tlp, headFinder,
+    treePrinter = new TreePrint(outputFormat, optionsString, tlp, headFinder,
         headFinder);
   }
 
@@ -138,10 +130,10 @@ public class Annotate {
    * @param kaf
    * @throws IOException
    */
-  public void parse(KAFDocument kaf) throws IOException {
+  public String parse(KAFDocument kaf) throws IOException {
 
     parsedDoc = this.getParse(kaf);
-    System.out.print(parsedDoc.toString());
+    return parsedDoc.toString();
   }
 
   /**
@@ -150,11 +142,11 @@ public class Annotate {
    * @param kaf
    * @throws Exception
    */
-  public void parseToKAF(KAFDocument kaf) throws Exception {
+  public String parseToKAF(KAFDocument kaf) throws Exception {
 
     parsedDoc = this.getParse(kaf);
     kaf.addConstituencyFromParentheses(parsedDoc.toString());
-    System.out.print(kaf.toString());
+    return  kaf.toString();
   }
 
 }
